@@ -1,0 +1,34 @@
+ul {
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+li {
+  width: 94%;
+  transition: all 0.3s ease-out;
+}
+.focusListsStyle {
+  width: 100%;
+  background: #d7ffb0;
+  margin: 5px 0;
+  border: 1px solid lawngreen;
+  transition: all 0.3s ease-out;
+}
+.myNewBtn {
+  margin: 0 10px;
+}
+.myNewTextArea {
+  z-index: -1;
+  outline: none;
+  text-decoration: none;
+  display: flex;
+  position: absolute;
+  top: 105%;
+  left: 0%;
+  width: 84%;
+  height: 120px;
+  resize: none;
+}
