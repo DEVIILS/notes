@@ -1,4 +1,5 @@
 let notesStore = [];
+let selectedListItemIdentifier = undefined;
 
 function render() {
     const notesParentNode = document.querySelector('#list');
@@ -9,7 +10,7 @@ function render() {
         return;
     }
 
-    const notesElements = notesStore.map(({ id, value }) => generateListItem(id, value));
+    const notesElements = notesStore.map((element) => generateListItem(element));
 
     notesParentNode.innerHTML = '';
     notesParentNode.append(...notesElements);
@@ -19,14 +20,67 @@ function render() {
     inputElement.value = '';
 }
 
-function generateListItem(id, value) {
-    const listItemElement = document.createElement('li');
-    listItemElement.className = 'list-group-item d-flex justify-content-between align-items-center';
-    listItemElement.setAttribute('data-id', id);
+function generateListItem({ id, value, completed }) {
+    const isSelectedItem = id === selectedListItemIdentifier;
 
+    /**
+     * List item
+     */
+    const listItemElement = document.createElement('li');
+    listItemElement.className = `list-group-item d-flex justify-content-between align-items-center${
+        isSelectedItem ? ' focusListsStyle' : ''
+    }`;
+    listItemElement.setAttribute('data-id', id);
+    listItemElement.addEventListener('click', () => {
+        if (id === selectedListItemIdentifier) {
+            selectedListItemIdentifier = undefined;
+
+            listItemElement.classList.remove('focusListsStyle');
+        } else {
+            selectedListItemIdentifier = id;
+
+            const notesParentNode = document.querySelector('#list');
+
+            notesParentNode.childNodes.forEach((node) => node.classList.remove('focusListsStyle'));
+
+            listItemElement.classList.add('focusListsStyle');
+        }
+    });
+
+    /**
+     * Title
+     */
     const title = document.createElement('span');
+    title.classList.toggle('text-decoration-line-through', completed);
     title.textContent = value;
 
+    /**
+     * Toggle button
+     */
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'btn btn-small btn-success myNewBtn';
+    toggleButton.setAttribute('data-toggle', completed);
+    toggleButton.textContent = '✓';
+    toggleButton.classList.toggle('btn-warning', completed);
+    toggleButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+
+        const targetId = event.target.closest('li').getAttribute('data-id');
+
+        notesStore = notesStore.map((el) => {
+            if (el.id === targetId) {
+                return { ...el, completed: !el.completed };
+            }
+
+            return el;
+        });
+
+        render();
+    });
+
+    /**
+     * Remove button
+     */
     const removeButton = document.createElement('button');
     removeButton.className = 'btn btn-small btn-danger';
     removeButton.textContent = '×';
@@ -39,8 +93,12 @@ function generateListItem(id, value) {
         render();
     });
 
+    /**
+     * Mount
+     */
     const buttonsContainer = document.createElement('div');
 
+    buttonsContainer.appendChild(toggleButton);
     buttonsContainer.appendChild(removeButton);
 
     listItemElement.appendChild(title);
